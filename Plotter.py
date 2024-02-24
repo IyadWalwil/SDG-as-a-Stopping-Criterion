@@ -198,15 +198,18 @@ class Plotter:
         Plots our findings.
 
         Parameters:
-            OG: Optimality gap.
-            FG: Feasibility gap.
-            KKT: Karush–Kuhn–Tucker error.
-            PDG: Projected duality gap.
-            SDG: Smoothed duality gap.
-            OG_bounds: Optimality gap bounds.
-            KKT_SDG_bounds: KKT and SDG approximation of each other.
-            PDG_SDG_bounds: PDG and SDG approximation of each other.
+            prob (str): Optimization problem
+            OG (numpy.ndarray): Optimality gap.
+            FG (numpy.ndarray): Feasibility gap.
+            KKT (numpy.ndarray): Karush–Kuhn–Tucker error.
+            PDG (numpy.ndarray): Projected duality gap.
+            SDG (numpy.ndarray): Smoothed duality gap.
+            OG_bounds (dict): Optimality gap bounds.
+            KKT_SDG_bounds (dict): KKT and SDG approximation of each other.
+            PDG_SDG_bounds (dict): PDG and SDG approximation of each other.
             step (int): The curve values have been appended every 'step' iteration(s).
+            min_ite (int): The length of the shorter array when plotting two arrays of different lengths.
+            measures (bool): Whether the plot the measures or not.
         """
         xlabel = 'Iteration/{}'.format(step)
         if prob == 'Basis Pursuit':
@@ -226,6 +229,22 @@ class Plotter:
 
     def paper_plots(self, prob, OG=None, FG=None, KKT=None, PDG = None, SDG = None, KKT2 = None, SDG2 = None,
                         OG_bounds=None, KKT_SDG_bounds=None, PDG_SDG_bounds=None, step=1, min_ite=None):
+        """
+        Plots the paper's figures.
+
+        Parameters:
+            prob (str): Optimization problem
+            OG (numpy.ndarray): Optimality gap.
+            FG (numpy.ndarray): Feasibility gap.
+            KKT (numpy.ndarray): Karush–Kuhn–Tucker error.
+            PDG (numpy.ndarray): Projected duality gap.
+            SDG (numpy.ndarray): Smoothed duality gap.
+            OG_bounds (dict): Optimality gap bounds.
+            KKT_SDG_bounds (dict): KKT and SDG approximation of each other.
+            PDG_SDG_bounds (dict): PDG and SDG approximation of each other.
+            step (int): The curve values have been appended every 'step' iteration(s).
+            min_ite (int): The length of the shorter array when plotting two arrays of different lengths.
+        """
         one_dim_dict, IID_dict, cov_dict, distributed_dict, QP_dict, BP_dict = self.paper_plots_dicts(OG, 
                                                         FG, KKT, PDG, OG_bounds, KKT_SDG_bounds, PDG_SDG_bounds)
         xlabel = 'Iteration/{}'.format(step)
@@ -254,6 +273,16 @@ class Plotter:
                             """)
     
     def SDG_stability(self, KKT, KKT2, SDG, SDG2, step = 1):
+        """
+        Plots version 1 vs. version 2 of PDHG for both: the KKT error and SDG
+
+        Parameters:
+            KKT (numpy.ndarray): Karush–Kuhn–Tucker error computed at the solution of version 1.
+            KKT2 (numpy.ndarray): Karush–Kuhn–Tucker error computed at the solution of version 2.
+            SDG (numpy.ndarray): Smoothed duality gap computed at the solution of version 1.
+            SDG2 (numpy.ndarray): Smoothed duality gap computed at the solution of version 2.
+            step (int): The curve values have been appended every 'step' iteration(s).
+        """
         xlabel = 'Iteration/{}'.format(step)
         fig, (ax1, ax2) = plt.subplots(1, 2)  # Increase figure size to (width, height)
         ax1.semilogy(KKT, label="PDHG Version 1")
@@ -282,11 +311,35 @@ class Plotter:
         plt.show()
 
     def plot_all(self, paper=True, prob=None, OG=None, FG=None, KKT=None, KKT2=None, PDG = None, SDG = None, SDG2=None, 
-                        OG_bounds=None, KKT_SDG_bounds=None, PDG_SDG_bounds=None, step=1, min_ite=None):
+                        OG_bounds=None, KKT_SDG_bounds=None, PDG_SDG_bounds=None, step=1, min_ite=None, measures=True):
+        """
+        Plots either the paper's figures or all the plots of our findings.
+
+        Parameters:
+            paper (bool): Whether to plot the paper's plots or our findings plots. 
+            prob (str): Optimization problem
+            OG (numpy.ndarray): Optimality gap.
+            FG (numpy.ndarray): Feasibility gap.
+            KKT (numpy.ndarray): Karush–Kuhn–Tucker error.
+                If prob == 'Basis Pursuit', it's computed at the solution of version 1.
+            KKT2 (numpy.ndarray): Karush–Kuhn–Tucker error.
+                If prob == 'Basis Pursuit', it's computed at the solution of version 2.
+            PDG (numpy.ndarray): Projected duality gap.
+            SDG (numpy.ndarray): Smoothed duality gap.
+                If prob == 'Basis Pursuit', it's computed at the solution of version 1.
+            SDG2 (numpy.ndarray): Smoothed duality gap.
+                If prob == 'Basis Pursuit', it's computed at the solution of version 2.
+            OG_bounds (dict): Optimality gap bounds.
+            KKT_SDG_bounds (dict): KKT and SDG approximation of each other.
+            PDG_SDG_bounds (dict): PDG and SDG approximation of each other.
+            step (int): The curve values have been appended every 'step' iteration(s).
+            min_ite (int): The length of the shorter array when plotting two arrays of different lengths.
+            measures (bool): Whether the plot the measures or not.
+        """
         if paper:
             self.paper_plots(prob, OG, FG, KKT, PDG, SDG, KKT2, SDG2, OG_bounds, KKT_SDG_bounds, PDG_SDG_bounds, step, min_ite)
         else:
-            self.findings_plot(prob, OG, FG, KKT, KKT2, PDG, SDG, SDG2, OG_bounds, KKT_SDG_bounds, PDG_SDG_bounds, step, min_ite) 
+            self.findings_plot(prob, OG, FG, KKT, KKT2, PDG, SDG, SDG2, OG_bounds, KKT_SDG_bounds, PDG_SDG_bounds, step, min_ite, measures) 
 
             
         
