@@ -1,5 +1,7 @@
 import numpy as np 
 import pandas as pd
+import tqdm.notebook as tn
+
 from OptimizationMeasures import OptimizationMeasures
 
     
@@ -105,7 +107,7 @@ class OptimizationBounds(OptimizationMeasures):
         else:
             raise TypeError("The chosen beta_mode is not correct.")
 
-    def optimality_measures(self, measure_list= ['OG', 'FG', 'KKT',  'PDG']):
+    def optimality_measures(self, measure_dict= {'OG': "Optimality gap", 'FG': "Feasibility gap", 'KKT': "KKT error",  'PDG': "PDG"}):
         """
         Computes the optimality measures (optimality gap, feasibility gap, KKT error, PDG, SDG) at each iteration.
 
@@ -124,13 +126,14 @@ class OptimizationBounds(OptimizationMeasures):
             'PDG': (np.zeros(l), lambda x, y: self.pdg(x, y)),
         }
 
-        selected_measures = [measures[measure] for measure in measure_list]
-
-        for k, (x, y) in enumerate(zip(self.primal_var, self.dual_var)):
-            for measure_array, measure_function in selected_measures:
+        selected_measures = [measures[measure] for measure in measure_dict.keys()]
+        for measure_name, (measure_array, measure_function) in zip(measure_dict.items(), selected_measures):
+            inner_bar = tn.trange(len(self.primal_var), desc=measure_name[1])
+            for (k, x, y) in zip(inner_bar, self.primal_var, self.dual_var):
                 measure_array[k] = measure_function(x, y)
+                inner_bar.set_postfix(**{measure_name[0]: measure_array[k]})
 
-        return {key: measure_array for key, (measure_array, _) in zip(measure_list, selected_measures)}
+        return {key: measure_array for key, (measure_array, _) in zip(measure_dict.keys(), selected_measures)}
     
     def SDG_fun(self, BETA):
         """
@@ -149,20 +152,27 @@ class OptimizationBounds(OptimizationMeasures):
             TypeError if the chosen beta_mode is not correct. 
         """
         l = len(self.primal_var)
+        bar = tn.tnrange(l)
         if self.beta_mode == 'cst':
             SDG = np.zeros(l)
-            for k, (x, y) in enumerate(zip(self.primal_var, self.dual_var)):
+            for (k, x, y) in zip(bar, self.primal_var, self.dual_var):
                 SDG[k] = self.sdg(x, y, BETA)
+                bar.set_postfix(SDG=SDG[k])
+                bar.set_description("SDG with constant beta")
         elif self.beta_mode == 'FG':
             SDG = np.zeros(l)
-            for k, (x, y) in enumerate(zip(self.primal_var, self.dual_var)):
+            for (k, x, y) in zip(bar, self.primal_var, self.dual_var):
                 SDG[k] = self.sdg(x, y, BETA.T[k])
+                bar.set_postfix(SDG=SDG[k])
+                bar.set_description("SDG with beta equals FG")
         elif self.beta_mode == 'mixed':
             SDG = np.zeros_like(BETA[0])
             BETAx, BETAy = BETA[0], BETA[1]
-            for k, (x, y) in enumerate(zip(self.primal_var, self.dual_var)):
+            for (k, x, y) in zip(bar, self.primal_var, self.dual_var):
                 for i in range(SDG.shape[1]):
                     SDG[k, i] = self.sdg(x, y, (BETAx[k, i], BETAy[k, i]))
+                    bar.set_postfix(SDG=SDG[k, i])
+                    bar.set_description("SDG matrix with multiple beta at each iteration")
         else: 
             raise TypeError("The chosen beta_mode is not correct.")
         return SDG
@@ -252,9 +262,17 @@ class OptimizationBounds(OptimizationMeasures):
         Returns:
             dict: Dictionary containing the optimality gap bounds: KKT, SDG, and PDG, respectively.
         """
+        print("""
+╔══════════════════════════════════════╗
+║        Optimality Gap Bounds         ║
+╚══════════════════════════════════════╝""")
+        print("")
         KKT_bound = self.OG_KKT()
+        print("* KKT approximation: Done")
         SDG_bound = self.OG_SDG()
+        print("* SDG approximation: Done")
         PDG_bound = self.OG_PDG()
+        print("* PDG approximation: Done")
         return {'KKT': KKT_bound, 'SDG': SDG_bound, 'PDG': PDG_bound}
 
 ########### Comparability Bounds ###########
@@ -315,7 +333,15 @@ class OptimizationBounds(OptimizationMeasures):
                   'K<G': Array of the SDG approximation for the KKT error.
                   'G<K': Array of the KKT approximation for SDG.
         """
-        return {'K<G': self.KKT_SDG(), 'G<K': self.SDG_KKT()}
+        print("""
+╔══════════════════════════════════════╗
+║        Comparability Bounds          ║
+╚══════════════════════════════════════╝""")
+        KG = self.KKT_SDG()
+        print("* SDG approximation for KKT: Done")
+        GK = self.SDG_KKT()
+        print("* KKT approximation for SDG: Done")
+        return {'K<G': KG, 'G<K': GK}
     
 # Result: PDG approximation for the smoothed duality gap.
     def SDG_PDG(self):
@@ -328,7 +354,6 @@ class OptimizationBounds(OptimizationMeasures):
                   'SDG': Array of SDG values.
         """
         if self.beta_mode == "mixed":
-            print('SDG -- PDG')
             SDG_copy = self.SDG.copy()
             BETAx, BETAy = self.beta.copy()
             beta_bar = np.minimum(BETAx, BETAy)
@@ -361,12 +386,10 @@ class OptimizationBounds(OptimizationMeasures):
             beta_Bar = np.maximum(BETAx, BETAy)
             term1 = 2 * beta_Bar * self.SDG
             if self.Lc is not None: # If the Fenchel-Conjugate is L-Lipschitz. 
-                print('PDG-SDG: Lipschitz function')
                 term2 = np.sqrt(2) * ((np.sqrt(BETAx) * (self.norm_X.reshape(-1, 1) + self.Lc)) + (np.sqrt(BETAy) * self.norm_Y.reshape(-1, 1))) * self.sq_SDG
                 bound = term1 + (self.SDG + term2)**2
                 return np.min(bound, axis=1)  # Finding the minimum over beta at each iteration.
             else:   # If the gradient of the Fenchel-Conjugate is L-Lipschitz.
-                print('PDG-SDG: Lipschitz gradient')
                 term2 = np.sqrt(2) * ((2 * np.sqrt(BETAx) * self.norm_X.reshape(-1, 1)) + (np.sqrt(BETAy) * self.norm_Y.reshape(-1, 1))) * self.sq_SDG
                 bound = term1 + (((3 + (BETAx * self.Lc_grad)) * self.SDG) + term2)**2
                 return np.min(bound, axis=1)  # Finding the minimum over beta at each iteration.
@@ -395,7 +418,9 @@ class OptimizationBounds(OptimizationMeasures):
                   'G<D': Array of the PDG approximation for SDG.
                   'D<G': Array of the SDG approximation for PDG.
         """
+        print("* PDG approximation for SDG: Done")
         GD = self.SDG_PDG()
+        print("* SDG approximation for PDG: Done")
         DG = self.PDG_SDG()
         return {'G<D': GD, 'D<G': DG}
     
