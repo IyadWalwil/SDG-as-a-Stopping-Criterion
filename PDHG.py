@@ -141,7 +141,7 @@ class PDHG:
         y = y_bar
         return x, y
 
-    def solve(self, stop_crt='SDG', tol=1e-9, stop_crt_kwargs={}, first_run_iter=None):
+    def solve(self, stop_crt='SDG', tol=1e-10, stop_crt_kwargs={}, first_run_iter=None):
         """
         Solve the optimization problem using the PDHG algorithm.
 
@@ -186,7 +186,7 @@ class PDHG:
             return {"No. of iterations": counter, "Primal optimal": x, "Dual optimal": y}
         else:
             print('Stopping criterion: Fixed number of iterations =', first_run_iter)
-            step = np.maximum(1, first_run_iter // 1500)
+            step = np.maximum(1, first_run_iter // 2000)
             print('We append the primal and dual solutions every', step, 'iteration(s)')
             primal_var, dual_var = [x_prev], [y]  # Initializing the primal-dual lists with the primal-dual initialization.
 
@@ -204,7 +204,7 @@ class PDHG:
                 dual_var.append(y)
             return {"step": step, "Primal variables": primal_var, "Dual variables": dual_var}
 
-    def two_runs(self, stop_crt='SDG', tol=1e-9, stop_crt_kwargs={}):
+    def two_runs(self, stop_crt='SDG', tol=1e-10, stop_crt_kwargs={}):
         """
         Perform two runs of the PDHG algorithm. 
             - The first run is done only to identify the required number of iterations.
@@ -283,7 +283,7 @@ class PDHG3(PDHG):
         y = y_bar
         return x_bar, x, y
 
-    def solve(self, stop_crt='SDG', tol=1e-8, stop_crt_kwargs={}, first_run_iter=None):
+    def solve(self, stop_crt='SDG', tol=1e-10, stop_crt_kwargs={}, first_run_iter=None):
         x_prev, y = self.xo, self.yo  # Primal-dual initialization 
         if stop_crt != "FNoI":  # If the employed stopping criterion is one of: 'DttO', 'KKT error', or 'SDG'.
             print('Stopping Criterion:', stop_crt)

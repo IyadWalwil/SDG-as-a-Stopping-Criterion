@@ -9,7 +9,7 @@ class OptimizationBounds(OptimizationMeasures):
     def __init__(self, primal_var = None, dual_var = None, f = None, prox_f = None, 
                     stationarity = None, fc = None, proj_fc = None, f_star = None, x_star = None, 
                         A = None, b = None, L = None, Lc = None, Lc_grad = None,
-                         beta = np.outer(10**(np.linspace(-7, 0, 26)), np.ones(2)), 
+                         beta = np.outer(10**(np.linspace(-8, 2, 40)), np.ones(2)), 
                          beta_mode = 'mixed', eta_fun = None, gamma = None):
         """
         Initializes an instance of the OptimizationBounds class.
@@ -62,6 +62,10 @@ class OptimizationBounds(OptimizationMeasures):
         self.beta, self.eta = self.beta_eta_processing(beta)
         # Computing SDG.
         self.SDG = self.SDG_fun(self.beta)
+        if beta_mode == 'mixed':
+            self.SDG_ = (self.SDG.copy())[:, -1]
+        else:
+            self.SDG_ = self.SDG.copy()
         # Computing the norm of the primal and dual updates at each iteration. 
         self.norm_X, self.norm_Y = self.norm_X(), self.norm_Y()
         # Computing the square root of: KKT, PDG, and SDG.
@@ -81,14 +85,18 @@ class OptimizationBounds(OptimizationMeasures):
         Raises:
             TypeError if the chosen beta_mode is not correct.
         """
+        print("""--> Processing of the smoothing parameter, beta, for SDG and computing the corresponding QEB constant, eta.""")
         if self.beta_mode == 'cst':  # beta is well-defined.
+            print("     --> Beta is constant = {}".format(tuple(beta)))
             return beta, self.eta_fun([beta])
         elif self.beta_mode == 'FG':  # beta equals the feasibility gap.  
+            print("     --> Beta is non-constant = ||Ax-b||, feasibility gap.")
             beta_FG = self.FG.copy() 
             beta = np.outer(beta_FG, np.ones(2))  # Assigning beta_x and beta_y the same values
             eta = self.eta_fun(beta)
             return beta.T, eta
         elif self.beta_mode == 'mixed': # beta is a list of constant values and the feasibility gap.
+            print("     --> Beta is mixed of several constant values and feasibility gap.")
             beta_FG = self.FG.copy()  # Feasibility gap part. 
             eta_FG = self.eta_fun(np.outer(beta_FG, np.ones(2))) # eta for bete equals the feasibility gap
             eta_list = self.eta_fun(beta)  # list of eta values for each constant value of beta
@@ -131,7 +139,7 @@ class OptimizationBounds(OptimizationMeasures):
             inner_bar = tn.trange(len(self.primal_var), desc=measure_name[1])
             for (k, x, y) in zip(inner_bar, self.primal_var, self.dual_var):
                 measure_array[k] = measure_function(x, y)
-                inner_bar.set_postfix(**{measure_name[0]: measure_array[k]})
+                # inner_bar.set_postfix(**{measure_name[0]: measure_array[k]})
 
         return {key: measure_array for key, (measure_array, _) in zip(measure_dict.keys(), selected_measures)}
     
@@ -171,8 +179,8 @@ class OptimizationBounds(OptimizationMeasures):
             for (k, x, y) in zip(bar, self.primal_var, self.dual_var):
                 for i in range(SDG.shape[1]):
                     SDG[k, i] = self.sdg(x, y, (BETAx[k, i], BETAy[k, i]))
-                    bar.set_postfix(SDG=SDG[k, i])
-                    bar.set_description("SDG matrix with multiple beta at each iteration")
+                    # bar.set_postfix(SDG=SDG[k, i])
+                    # bar.set_description("SDG matrix with multiple beta at each iteration")
         else: 
             raise TypeError("The chosen beta_mode is not correct.")
         return SDG
@@ -251,7 +259,7 @@ class OptimizationBounds(OptimizationMeasures):
             bound = np.min(bound, axis=1) 
             return bound
         else:
-            SDG_PDG = self.SDG_PDG()[0].reshape(-1)
+            SDG_PDG = self.SDG_PDG()['bound']
             return (1 + self.norm_X + np.sqrt(SDG_PDG/self.eta))*self.sq_PDG
 
 # Optimality gap bounds together.
@@ -266,7 +274,6 @@ class OptimizationBounds(OptimizationMeasures):
 ╔══════════════════════════════════════╗
 ║        Optimality Gap Bounds         ║
 ╚══════════════════════════════════════╝""")
-        print("")
         KKT_bound = self.OG_KKT()
         print("* KKT approximation: Done")
         SDG_bound = self.OG_SDG()
@@ -398,12 +405,10 @@ class OptimizationBounds(OptimizationMeasures):
             beta_Bar = np.maximum(beta_x, beta_y)
             term1 = 2 * beta_Bar * self.SDG
             if self.Lc is not None:  # If the Fenchel-Conjugate is L-Lipschitz. 
-                print('PDG-SDG: Lipschitz function')
                 term2 = np.sqrt(2) * ((np.sqrt(beta_x) * (self.norm_X + self.Lc)) + (np.sqrt(beta_y) * self.norm_Y)) * self.sq_SDG
                 bound = term1 + (self.SDG + term2)**2
                 return bound
             else:  # If the gradient of the Fenchel-Conjugate is L-Lipschitz.
-                print('PDG-SDG: Lipschitz gradient')
                 term2 = np.sqrt(2) * ((np.sqrt(beta_x) * self.norm_X) + (np.sqrt(beta_y) * self.norm_Y)) * self.sq_SDG
                 bound = term1 + (((3 + (beta_x * self.Lc_grad)) * self.SDG) + term2)**2
                 return bound 

@@ -131,18 +131,18 @@ class Plotter:
     def paper_plots_dicts(self, OG, FG, KKT, PDG, OG_bounds, KKT_SDG_bounds, PDG_SDG_bounds):
         one_dim_dict = {"Fig. 3 - (a)": {"$\mathcal{K}(z)$": KKT, 
                                         "$\\bar{\\beta}_L \mathcal{G}_{\\beta}(z)$": KKT_SDG_bounds["K<G"]},
-                        "Fig. 7 - (a)": {"$\mathcal{G}(z)$": PDG_SDG_bounds["G<D"]['SDG'], 
+                        "Fig. 7 - (a)": {"SDG": PDG_SDG_bounds["G<D"]['SDG'], 
                                          'PDG bound': PDG_SDG_bounds["G<D"]['bound']},
-                        "Fig. 8 - (a)": {"$\mathcal{D}(z)$": PDG, 
+                        "Fig. 8 - (a)": {"PDG": PDG, 
                                          'SDG bound': PDG_SDG_bounds["D<G"]}
                         }
         IID_dict = {"Fig. 3 - (b)": {"$\mathcal{K}(z)$": KKT, 
                                     "$\\bar{\\beta}_L \mathcal{G}_{\\beta}(z)$": KKT_SDG_bounds["K<G"]}} 
         cov_dict = {"Fig. 3 - (c)": {"$\mathcal{G}(z)$": KKT_SDG_bounds["G<K"]['SDG'], 
                                      '$β̲ \mathcal{K}(z)$': KKT_SDG_bounds["G<K"]['bound']},
-                    "Fig. 7 - (b)": {"$\mathcal{G}(z)$": PDG_SDG_bounds["G<D"]['SDG'], 
+                    "Fig. 7 - (b)": {"SDG": PDG_SDG_bounds["G<D"]['SDG'], 
                                     'PDG bound': PDG_SDG_bounds["G<D"]['bound']},
-                    "Fig. 8 - (b)": {"$\mathcal{D}(z)$": PDG, 
+                    "Fig. 8 - (b)": {"PDG": PDG, 
                                      'SDG bound': PDG_SDG_bounds["D<G"]}
                     }
         distributed_dict = {"Fig. 4": {"Optimality gap": OG + FG,
@@ -150,14 +150,14 @@ class Plotter:
                                                   "SDG bound": OG_bounds['SDG']+FG,
                                                   "PDG bound": OG_bounds['PDG']+FG
                                                   }}
-        QP_dict = {"Fig. 5 - (a)": {"$\mathcal{G}(z)$": PDG_SDG_bounds["G<D"]['SDG'], 
+        QP_dict = {"Fig. 5 - (a)": {"SDG": PDG_SDG_bounds["G<D"]['SDG'], 
                                     "PDG bound": PDG_SDG_bounds["G<D"]['bound']},
-                   "Fig. 5 - (b)": {"$\mathcal{D}(z)$": PDG, 
+                   "Fig. 5 - (b)": {"PDG": PDG, 
                                     'SDG bound': PDG_SDG_bounds["D<G"]}
                     }
-        BP_dict = {"Fig. 7 - (c)": {"$\mathcal{G}(z)$": PDG_SDG_bounds["G<D"]['SDG'], 
+        BP_dict = {"Fig. 7 - (c)": {"SDG": PDG_SDG_bounds["G<D"]['SDG'], 
                                     "PDG bound": PDG_SDG_bounds["G<D"]['bound']},
-                   "Fig. 8 - (c)": {"$\mathcal{D}(z)$": PDG, 
+                   "Fig. 8 - (c)": {"PDG": PDG, 
                                     'SDG bound': PDG_SDG_bounds["D<G"]}
                     }
         return one_dim_dict, IID_dict, cov_dict, distributed_dict, QP_dict, BP_dict
@@ -180,7 +180,7 @@ class Plotter:
         plt.figure()
         for title, sub_dict in data_dict.items():
             for (label, fun), marker in zip(sub_dict.items(), markers_list):
-                plt.semilogy(fun, label=label, marker = marker, markevery = max(1, (len(fun)//15)))
+                plt.semilogy(fun, label=label, marker = marker, markevery = max(1, (len(fun)//20)))
             if show_titles:
                 plt.title(title, fontsize=15)
             plt.xlabel(xlabel, fontsize=14)
@@ -192,8 +192,8 @@ class Plotter:
                 plt.legend(loc= labels_loc, fancybox=True, prop={'size': 12}, framealpha=0.4)
             plt.show()
     
-    def findings_plot(self, prob = None, OG=None, FG=None, KKT=None, KKT2=None, PDG = None, SDG=None, SDG2=None,
-                            OG_bounds=None, KKT_SDG_bounds=None, PDG_SDG_bounds=None, step=1, min_ite=None, measures=True):
+    def findings_plot(self, prob = None, OG=None, FG=None, KKT=None, PDG = None, SDG=None, OG_bounds=None, 
+                        KKT_SDG_bounds=None, PDG_SDG_bounds=None, step=1, min_ite=None, measures=True, show_titles=True, BP_kwargs={}):
         """
         Plots our findings.
 
@@ -210,25 +210,30 @@ class Plotter:
             step (int): The curve values have been appended every 'step' iteration(s).
             min_ite (int): The length of the shorter array when plotting two arrays of different lengths.
             measures (bool): Whether the plot the measures or not.
+            show_titles (bool): Whether to show titles for plots.
+            BP_kwargs (dict): More arguments for the Basis Pursuit experiment. 
+                              For instance, KKT and SDG of version 2 of PDHG. 
+
         """
         xlabel = 'Iteration/{}'.format(step)
         if prob == 'Basis Pursuit':
+            KKT2, SDG2 = BP_kwargs['KKT2'], BP_kwargs['SDG2']
             self.SDG_stability(KKT[:min_ite], KKT2[:min_ite], SDG[:min_ite], SDG2[:min_ite], step=step)
         if measures:
             measures_dict = self.measures_dict(OG, FG, KKT, PDG, SDG)
-            self.plot(measures_dict, xlabel=xlabel)
+            self.plot(measures_dict, xlabel=xlabel, show_titles=show_titles)
         if OG_bounds is not None:
             OG_dict = self.OG_dict(OG, FG, OG_bounds)
-            self.plot(OG_dict, xlabel=xlabel)
+            self.plot(OG_dict, xlabel=xlabel, show_titles=show_titles)
         if KKT_SDG_bounds is not None:
             KKT_SDG_dict = self.KKT_SDG_dict(KKT, KKT_SDG_bounds)
-            self.plot(KKT_SDG_dict, xlabel=xlabel)
+            self.plot(KKT_SDG_dict, xlabel=xlabel, show_titles=show_titles)
         if PDG_SDG_bounds is not None:
             PDG_SDG_dict = self.PDG_SDG_dict(PDG, PDG_SDG_bounds)
-            self.plot(PDG_SDG_dict, xlabel=xlabel)
+            self.plot(PDG_SDG_dict, xlabel=xlabel, show_titles=show_titles)
 
-    def paper_plots(self, prob, OG=None, FG=None, KKT=None, PDG = None, SDG = None, KKT2 = None, SDG2 = None,
-                        OG_bounds=None, KKT_SDG_bounds=None, PDG_SDG_bounds=None, step=1, min_ite=None):
+    def paper_plots(self, prob, OG=None, FG=None, KKT=None, PDG = None, SDG = None,
+                        OG_bounds=None, KKT_SDG_bounds=None, PDG_SDG_bounds=None, step=1, min_ite=None, show_titles=False, BP_kwargs={}):
         """
         Plots the paper's figures.
 
@@ -244,24 +249,27 @@ class Plotter:
             PDG_SDG_bounds (dict): PDG and SDG approximation of each other.
             step (int): The curve values have been appended every 'step' iteration(s).
             min_ite (int): The length of the shorter array when plotting two arrays of different lengths.
+            show_titles (bool): Whether to show titles for plots.
+            BP_kwargs (dict): More arguments for the Basis Pursuit experiment. 
+                              For instance, KKT and SDG of version 2 of PDHG. 
         """
         one_dim_dict, IID_dict, cov_dict, distributed_dict, QP_dict, BP_dict = self.paper_plots_dicts(OG, 
                                                         FG, KKT, PDG, OG_bounds, KKT_SDG_bounds, PDG_SDG_bounds)
         xlabel = 'Iteration/{}'.format(step)
         if prob == 'One-dimensional':
-            self.plot(one_dim_dict, xlabel=xlabel)
+            self.plot(one_dim_dict, xlabel=xlabel, show_titles=show_titles)
         elif prob == 'I.I.D. Gaussian matrices':
-            self.plot(IID_dict, xlabel=xlabel)
+            self.plot(IID_dict, xlabel=xlabel, show_titles=show_titles)
         elif prob == 'Non-trivial covariance':
-            self.plot(cov_dict, xlabel=xlabel)
+            self.plot(cov_dict, xlabel=xlabel, show_titles=show_titles)
         elif prob == 'Distributed optimization':
-            self.plot(distributed_dict, xlabel=xlabel)
+            self.plot(distributed_dict, xlabel=xlabel, show_titles=show_titles)
         elif prob == 'Quadratic programming':
-            self.plot(QP_dict, xlabel=xlabel)
+            self.plot(QP_dict, xlabel=xlabel, show_titles=show_titles)
         elif prob == 'Basis Pursuit':
-            self.SDG_stability(KKT[:min_ite], KKT2[:min_ite], SDG[:min_ite], SDG2[:min_ite], step=step)
-            
-            self.plot(BP_dict, xlabel=xlabel)
+            KKT2, SDG2 = BP_kwargs['KKT2'], BP_kwargs['SDG2']
+            self.SDG_stability(KKT[:min_ite], KKT2[:min_ite], SDG[:min_ite], SDG2[:min_ite], step=step, show_titles=show_titles)
+            self.plot(BP_dict, xlabel=xlabel, show_titles=show_titles)
         else:
             raise TypeError("""The specified problem is not correct, please choose one of the following:
                                 * One-dimensional
@@ -272,7 +280,7 @@ class Plotter:
                                 * Basis Pursuit
                             """)
     
-    def SDG_stability(self, KKT, KKT2, SDG, SDG2, step = 1):
+    def SDG_stability(self, KKT, KKT2, SDG, SDG2, step = 1, show_titles=True):
         """
         Plots version 1 vs. version 2 of PDHG for both: the KKT error and SDG
 
@@ -282,6 +290,7 @@ class Plotter:
             SDG (numpy.ndarray): Smoothed duality gap computed at the solution of version 1.
             SDG2 (numpy.ndarray): Smoothed duality gap computed at the solution of version 2.
             step (int): The curve values have been appended every 'step' iteration(s).
+            show_titles (bool): Whether to show titles for plots.
         """
         xlabel = 'Iteration/{}'.format(step)
         fig, (ax1, ax2) = plt.subplots(1, 2)  # Increase figure size to (width, height)
@@ -306,12 +315,13 @@ class Plotter:
         ax2.yaxis.tick_right()  # Move the y-axis ticks to the right side
         ax2.yaxis.set_label_position("right")  # Set the label position to the right side
 
-        plt.suptitle("Superior stability of SDG over the KKT error")  # Adding the main title
+        if show_titles:
+            plt.suptitle("Superior stability of SDG over the KKT error")  # Adding the main title
         plt.tight_layout()  # Adjusts subplot parameters to fit the figure area
         plt.show()
 
-    def plot_all(self, paper=True, prob=None, OG=None, FG=None, KKT=None, KKT2=None, PDG = None, SDG = None, SDG2=None, 
-                        OG_bounds=None, KKT_SDG_bounds=None, PDG_SDG_bounds=None, step=1, min_ite=None, measures=True):
+    def plot_all(self, paper=True, prob=None, OG=None, FG=None, KKT=None, PDG = None, SDG = None, OG_bounds=None, 
+                 KKT_SDG_bounds=None, PDG_SDG_bounds=None, step=1, min_ite=None, measures=True, show_titles=False, BP_kwargs={}):
         """
         Plots either the paper's figures or all the plots of our findings.
 
@@ -335,11 +345,14 @@ class Plotter:
             step (int): The curve values have been appended every 'step' iteration(s).
             min_ite (int): The length of the shorter array when plotting two arrays of different lengths.
             measures (bool): Whether the plot the measures or not.
+            show_titles (bool): Whether to show titles for plots.
+            BP_kwargs (dict): More arguments for the Basis Pursuit experiment. 
+                              For instance, KKT and SDG of version 2 of PDHG. 
         """
         if paper:
-            self.paper_plots(prob, OG, FG, KKT, PDG, SDG, KKT2, SDG2, OG_bounds, KKT_SDG_bounds, PDG_SDG_bounds, step, min_ite)
+            self.paper_plots(prob, OG, FG, KKT, PDG, SDG, OG_bounds, KKT_SDG_bounds, PDG_SDG_bounds, step, min_ite, show_titles, BP_kwargs)
         else:
-            self.findings_plot(prob, OG, FG, KKT, KKT2, PDG, SDG, SDG2, OG_bounds, KKT_SDG_bounds, PDG_SDG_bounds, step, min_ite, measures) 
+            self.findings_plot(prob, OG, FG, KKT, PDG, SDG, OG_bounds, KKT_SDG_bounds, PDG_SDG_bounds, step, min_ite, measures, show_titles, BP_kwargs) 
 
             
         
