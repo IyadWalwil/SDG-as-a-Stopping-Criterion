@@ -139,7 +139,7 @@ class OptimizationBounds(OptimizationMeasures):
             inner_bar = tn.trange(len(self.primal_var), desc=measure_name[1])
             for (k, x, y) in zip(inner_bar, self.primal_var, self.dual_var):
                 measure_array[k] = measure_function(x, y)
-                # inner_bar.set_postfix(**{measure_name[0]: measure_array[k]})
+                inner_bar.set_postfix(**{measure_name[0]: measure_array[k]})
 
         return {key: measure_array for key, (measure_array, _) in zip(measure_dict.keys(), selected_measures)}
     
@@ -179,8 +179,8 @@ class OptimizationBounds(OptimizationMeasures):
             for (k, x, y) in zip(bar, self.primal_var, self.dual_var):
                 for i in range(SDG.shape[1]):
                     SDG[k, i] = self.sdg(x, y, (BETAx[k, i], BETAy[k, i]))
-                    # bar.set_postfix(SDG=SDG[k, i])
-                    # bar.set_description("SDG matrix with multiple beta at each iteration")
+                    bar.set_postfix(SDG=SDG[k, i])
+                    bar.set_description("SDG matrix with multiple beta at each iteration")
         else: 
             raise TypeError("The chosen beta_mode is not correct.")
         return SDG
