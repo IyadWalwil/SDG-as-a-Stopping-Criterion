@@ -45,6 +45,12 @@ Moreover, the author in `[1]` has found that the smoothed duality gap offers a r
 
 5. **`OptimizationProblems.py`**: Encapsulates the analysis of the various optimization problems presented in Section **7**.
 
+
+### Installation Instructions:
+
+Install all the packages listed in the requirements.txt file.
+
+
 ### Usage Instructions:
 
 To experiment with the code, simply run the **`Experiments.ipynb`** file, which contains all the conducted experiments. This notebook initializes several instances of the problems defined in `OptimizationProblems.py`, solves them using `PDHG.py`, computes measures and bounds with `OptimizationBounds.py`, and finally visualizes the results using `Plotter.py`.
