@@ -321,7 +321,7 @@ class Plotter:
         plt.show()
 
     def plot_all(self, paper=True, prob=None, OG=None, FG=None, KKT=None, PDG = None, SDG = None, OG_bounds=None, 
-                 KKT_SDG_bounds=None, PDG_SDG_bounds=None, step=1, min_ite=None, measures=True, show_titles=False, BP_kwargs={}):
+                 KKT_SDG_bounds=None, PDG_SDG_bounds=None, step=1, min_ite=None, measures=True, show_titles=True, BP_kwargs={}):
         """
         Plots either the paper's figures or all the plots of our findings.
 
@@ -331,14 +331,8 @@ class Plotter:
             OG (numpy.ndarray): Optimality gap.
             FG (numpy.ndarray): Feasibility gap.
             KKT (numpy.ndarray): Karush–Kuhn–Tucker error.
-                If prob == 'Basis Pursuit', it's computed at the solution of version 1.
-            KKT2 (numpy.ndarray): Karush–Kuhn–Tucker error.
-                If prob == 'Basis Pursuit', it's computed at the solution of version 2.
             PDG (numpy.ndarray): Projected duality gap.
             SDG (numpy.ndarray): Smoothed duality gap.
-                If prob == 'Basis Pursuit', it's computed at the solution of version 1.
-            SDG2 (numpy.ndarray): Smoothed duality gap.
-                If prob == 'Basis Pursuit', it's computed at the solution of version 2.
             OG_bounds (dict): Optimality gap bounds.
             KKT_SDG_bounds (dict): KKT and SDG approximation of each other.
             PDG_SDG_bounds (dict): PDG and SDG approximation of each other.
