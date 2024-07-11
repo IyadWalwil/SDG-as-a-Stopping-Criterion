@@ -39,7 +39,7 @@ Moreover, the author in `[1]` has found that the smoothed duality gap offers a r
    - Projected Duality Gap **(PDG)**.
    - Smoothed Duality Gap **(SDG)**.
 
-3. **`OptimizationBounds.py`**: Implements the theoretical findings presented in Sections **5 & 6**.
+3. **[`OptimizationBounds.py`](OptimizationBounds.py)**: Implements the theoretical findings presented in Sections **5 & 6**.
 
 4. **`Plotter.py`**: Utilizes `matplotlib` to plot curves by taking a dictionary of curves along with their labels and titles.
 
