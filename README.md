@@ -3,7 +3,7 @@
 This repository contains the code developed to validate and illustrate the theoretical findings outlined in the paper titled **"The Smoothed Duality Gap as a Stopping Criterion"** by Iyad Walwil and Olivier Fercoq.
 
 ### Smoothed Duality Gap
-The *Smoothed Duality Gap*, initially introduced in `[3]`, represents a novel measure of optimality that is widely applicable but remains less studied compared to the previously discussed ones.
+The *Smoothed Duality Gap*, initially introduced in [[3](#3)], represents a novel measure of optimality that is widely applicable but remains less studied compared to the previously discussed ones.
 
 Given $\beta = (\beta_x, \beta_y) \in [0, +\infty]^2, z \in \mathcal{Z}$ and $\dot{z} \in \mathcal{Z}$, the smoothed gap $\mathcal{G}_{\beta}$ is the function defined by:
 
@@ -11,13 +11,13 @@ $$
 \mathcal{G}_{\beta}(z;\dot{z}) = \\sup ~ \mathcal{L}(x, y') - \mathcal{L}(x', y) - \frac{\beta_x}{2} \\|x' - \dot{x}\\|^2 - \frac{\beta_y}{2} \\|y' - \dot{y}\\|^2
 $$
 
-Where the sup is taken over $z' = (x', y')$. When the smoothness parameter $\beta = 0$, we recover the conventional duality gap. The smoothed duality gap concept involves smoothing the duality gap through a proximity function `[2]`, thereby ensuring that the smoothed duality gap attains finite values for constrained problems, unlike its conventional counterpart. Additionally, when the smoothness parameter is small and the smoothed duality gap is small, it signifies that both the optimality gap and the feasibility error are also small.
+Where the sup is taken over $z' = (x', y')$. When the smoothness parameter $\beta = 0$, we recover the conventional duality gap. The smoothed duality gap concept involves smoothing the duality gap through a proximity function [[2](#2)], thereby ensuring that the smoothed duality gap attains finite values for constrained problems, unlike its conventional counterpart. Additionally, when the smoothness parameter is small and the smoothed duality gap is small, it signifies that both the optimality gap and the feasibility error are also small.
 
-Moreover, the author in `[1]` has found that the smoothed duality gap offers a robust outcome. Independently of any unknown or uncomputable variables, it serves as a valid optimality measure. Therefore,  it could be utilized as a stopping criterion.
+Moreover, the author in [[1](#1)] has found that the smoothed duality gap offers a robust outcome. Independently of any unknown or uncomputable variables, it serves as a valid optimality measure. Therefore,  it could be utilized as a stopping criterion.
 
 ### Modules Overview:
 
-1. **`PDHG.py`**: This module implements the Primal-Dual Hybrid Gradient (PDHG) algorithm for solving optimization problems of the form:
+1. **[`PDHG.py`](PDHG.py)**: This module implements the Primal-Dual Hybrid Gradient (PDHG) algorithm for solving optimization problems of the form:
    
     $$\min_{x \in \mathcal{X}} \max_{y \in \mathcal{Y}}~ f(x) + \left\langle Ax - b, y \right\rangle $$
 
@@ -32,28 +32,67 @@ Moreover, the author in `[1]` has found that the smoothed duality gap offers a r
    - Karush-Kuhn-Tucker **(KKT)** error.
    - Smoothed Duality Gap **(SDG)** - *Default*.
 
-2. **`OptimizationMeasures.py`**: Computes the various optimality measures studied in Sections **3 & 4** of the paper:
+2. **[`OptimizationMeasures.py`](OptimizationMeasures.py)**: Computes the various optimality measures studied in Sections **3 & 4** of the paper:
    - Optimality Gap **(OG)**.
    - Feasibility Gap **(FG)**.
    - Karush-Kuhn-Tucker **(KKT)** error.
    - Projected Duality Gap **(PDG)**.
    - Smoothed Duality Gap **(SDG)**.
 
-3. **`OptimizationBounds.py`**: Implements the theoretical findings presented in Sections **5 & 6**.
+3. **[`OptimizationBounds.py`](OptimizationBounds.py)**: Implements the theoretical findings presented in Sections **5 & 6**.
 
-4. **`Plotter.py`**: Utilizes `matplotlib` to plot curves by taking a dictionary of curves along with their labels and titles.
+4. **[`Plotter.py`](Plotter.py)**: Utilizes [`matplotlib`](https://matplotlib.org) to plot curves by taking a dictionary of curves along with their labels and titles.
 
-5. **`OptimizationProblems.py`**: Encapsulates the analysis of the various optimization problems presented in Section **7**.
+5. **[`OptimizationProblems.py`](OptimizationProblems.py)**: Encapsulates the analysis of the various optimization problems presented in Section **7**.
 
 
 ### Installation Instructions:
 
-Install all the packages listed in the requirements.txt file.
+Install all the packages listed in the *[`requirements.txt`](requirements.txt)* file.
 
 
 ### Usage Instructions:
 
-To experiment with the code, simply run the **`Experiments.ipynb`** file, which contains all the conducted experiments. This notebook initializes several instances of the problems defined in `OptimizationProblems.py`, solves them using `PDHG.py`, computes measures and bounds with `OptimizationBounds.py`, and finally visualizes the results using `Plotter.py`.
+To experiment with the code, simply run the **[`Experiments.ipynb`](Experiments.ipynb)** file, which contains all the conducted experiments. This notebook initializes several instances of the problems defined in [`OptimizationProblems.py`](OptimizationProblems.py), solves them using [`PDHG.py`](PDHG.py), computes measures and bounds with [`OptimizationBounds.py`](OptimizationBounds.py), and finally visualizes the results using [`Plotter.py`](Plotter.py).
+
+
+#### Running a Notebook File on the VM
+
+To run a notebook file on the VM, follow these steps in a terminal:
+
+1. **SSH into the VM:**
+   ```sh
+   ssh your_username@vm_address
+   ```
+
+2. **Navigate to the project directory:**
+   ```sh
+   cd SDG-as-a-Stopping-Criterion
+   ```
+
+3. **Start the Jupyter Notebook server:**
+   ```sh
+   jupyter notebook --no-browser --ip=0.0.0.0 --port=8888
+   ```
+   This command will launch the Jupyter server on the VM, listening on all IP addresses (`0.0.0.0`) and port `8888`.
+
+4. **Note the URL with the token:**
+   When the Jupyter server starts, it will display a URL with a token (e.g., `http://0.0.0.0:8888/?token=...`). You'll need this token to access the notebook server from your local machine.
+
+5. **Open a new terminal window on your local machine.**
+
+6. **Set up port forwarding:**
+   ```sh
+   ssh -i your_ssh_key -L 8888:localhost:8888 your_username@vm_address
+   ```
+
+7. **Open a web browser and go to:**
+   ```sh
+   http://localhost:8888
+   ```
+
+8. **Enter the token provided by the Jupyter server** to access the notebook interface.
+
 
 ### Credits:
 
@@ -63,8 +102,9 @@ To experiment with the code, simply run the **`Experiments.ipynb`** file, which 
 
 ### References
 
-`[1]`: Fercoq, O.: Quadratic error bound of the smoothed gap and the restarted averaged primal-dual hybrid gradient. Open Journal of Mathematical Optimization 4, 6 (2023). DOI 10.5802/ojmo.26. URL https://ojmo.centre-mersenne.org/articles/10.5802/ojmo.26/.
+<a id="1"></a>`[1]`: Fercoq, O.: Quadratic error bound of the smoothed gap and the restarted averaged primal-dual hybrid gradient. Open Journal of Mathematical Optimization 4, 6 (2023). DOI 10.5802/ojmo.26. URL https://ojmo.centre-mersenne.org/articles/10.5802/ojmo.26/.
 
-`[2]`: Nesterov, Y.: Smooth minimization of non-smooth functions Mathematical Programming 103, 127–152 (2005). URL https://api.semanticscholar.org/CorpusID:2391217.
+<a id="2"></a>`[2]`: Nesterov, Y.: Smooth minimization of non-smooth functions Mathematical Programming 103, 127–152 (2005). URL https://api.semanticscholar.org/CorpusID:2391217.
 
-`[3]`: Tran-Dinh, Q., Fercoq, O., Cevher, V.: A smooth primal-dual optimization framework for nonsmooth composite convex minimization. SIAM Journal on Optimization 28(1), 96–134 (2018). DOI 10.1137/16M1093094. URL https://doi.org/10.1137/16M1093094. 
+<a id="3"></a>`[3]`: Tran-Dinh, Q., Fercoq, O., Cevher, V.: A smooth primal-dual optimization framework for nonsmooth composite convex minimization. SIAM Journal on Optimization 28(1), 96–134 (2018). DOI 10.1137/16M1093094. URL https://doi.org/10.1137/16M1093094. 
+
