@@ -3,7 +3,7 @@
 This repository contains the code developed to validate and illustrate the theoretical findings outlined in the paper titled **"The Smoothed Duality Gap as a Stopping Criterion"** by Iyad Walwil and Olivier Fercoq.
 
 ### Smoothed Duality Gap
-The *Smoothed Duality Gap*, initially introduced in `[3]`, represents a novel measure of optimality that is widely applicable but remains less studied compared to the previously discussed ones.
+The *Smoothed Duality Gap*, initially introduced in `[3]`(#3), represents a novel measure of optimality that is widely applicable but remains less studied compared to the previously discussed ones.
 
 Given $\beta = (\beta_x, \beta_y) \in [0, +\infty]^2, z \in \mathcal{Z}$ and $\dot{z} \in \mathcal{Z}$, the smoothed gap $\mathcal{G}_{\beta}$ is the function defined by:
 
@@ -11,13 +11,13 @@ $$
 \mathcal{G}_{\beta}(z;\dot{z}) = \\sup ~ \mathcal{L}(x, y') - \mathcal{L}(x', y) - \frac{\beta_x}{2} \\|x' - \dot{x}\\|^2 - \frac{\beta_y}{2} \\|y' - \dot{y}\\|^2
 $$
 
-Where the sup is taken over $z' = (x', y')$. When the smoothness parameter $\beta = 0$, we recover the conventional duality gap. The smoothed duality gap concept involves smoothing the duality gap through a proximity function `[2]`, thereby ensuring that the smoothed duality gap attains finite values for constrained problems, unlike its conventional counterpart. Additionally, when the smoothness parameter is small and the smoothed duality gap is small, it signifies that both the optimality gap and the feasibility error are also small.
+Where the sup is taken over $z' = (x', y')$. When the smoothness parameter $\beta = 0$, we recover the conventional duality gap. The smoothed duality gap concept involves smoothing the duality gap through a proximity function `[2]`(#2), thereby ensuring that the smoothed duality gap attains finite values for constrained problems, unlike its conventional counterpart. Additionally, when the smoothness parameter is small and the smoothed duality gap is small, it signifies that both the optimality gap and the feasibility error are also small.
 
-Moreover, the author in `[1]` has found that the smoothed duality gap offers a robust outcome. Independently of any unknown or uncomputable variables, it serves as a valid optimality measure. Therefore,  it could be utilized as a stopping criterion.
+Moreover, the author in `[1]`(#1) has found that the smoothed duality gap offers a robust outcome. Independently of any unknown or uncomputable variables, it serves as a valid optimality measure. Therefore,  it could be utilized as a stopping criterion.
 
 ### Modules Overview:
 
-1. **`PDHG.py`**: This module implements the Primal-Dual Hybrid Gradient (PDHG) algorithm for solving optimization problems of the form:
+1. **[`PDHG.py`](PDHG.py)**: This module implements the Primal-Dual Hybrid Gradient (PDHG) algorithm for solving optimization problems of the form:
    
     $$\min_{x \in \mathcal{X}} \max_{y \in \mathcal{Y}}~ f(x) + \left\langle Ax - b, y \right\rangle $$
 
@@ -32,7 +32,7 @@ Moreover, the author in `[1]` has found that the smoothed duality gap offers a r
    - Karush-Kuhn-Tucker **(KKT)** error.
    - Smoothed Duality Gap **(SDG)** - *Default*.
 
-2. **`OptimizationMeasures.py`**: Computes the various optimality measures studied in Sections **3 & 4** of the paper:
+2. **[`OptimizationMeasures.py`](OptimizationMeasures.py)**: Computes the various optimality measures studied in Sections **3 & 4** of the paper:
    - Optimality Gap **(OG)**.
    - Feasibility Gap **(FG)**.
    - Karush-Kuhn-Tucker **(KKT)** error.
@@ -41,19 +41,19 @@ Moreover, the author in `[1]` has found that the smoothed duality gap offers a r
 
 3. **[`OptimizationBounds.py`](OptimizationBounds.py)**: Implements the theoretical findings presented in Sections **5 & 6**.
 
-4. **`Plotter.py`**: Utilizes `matplotlib` to plot curves by taking a dictionary of curves along with their labels and titles.
+4. **[`Plotter.py`](Plotter.py)**: Utilizes [`matplotlib`](https://matplotlib.org) to plot curves by taking a dictionary of curves along with their labels and titles.
 
-5. **`OptimizationProblems.py`**: Encapsulates the analysis of the various optimization problems presented in Section **7**.
+5. **[`OptimizationProblems.py`](OptimizationProblems.py)**: Encapsulates the analysis of the various optimization problems presented in Section **7**.
 
 
 ### Installation Instructions:
 
-Install all the packages listed in the requirements.txt file.
+Install all the packages listed in the **'[requirements.txt'](requirements.txt)** file.
 
 
 ### Usage Instructions:
 
-To experiment with the code, simply run the **`Experiments.ipynb`** file, which contains all the conducted experiments. This notebook initializes several instances of the problems defined in `OptimizationProblems.py`, solves them using `PDHG.py`, computes measures and bounds with `OptimizationBounds.py`, and finally visualizes the results using `Plotter.py`.
+To experiment with the code, simply run the **[`Experiments.ipynb`](Experiments.ipynb)** file, which contains all the conducted experiments. This notebook initializes several instances of the problems defined in [`OptimizationProblems.py`](OptimizationProblems.py), solves them using [`PDHG.py`](PDHG.py), computes measures and bounds with [`OptimizationBounds.py`](OptimizationBounds.py), and finally visualizes the results using [`Plotter.py`](Plotter.py).
 
 ### Credits:
 
