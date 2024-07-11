@@ -48,7 +48,7 @@ Moreover, the author in [[1](#1)] has found that the smoothed duality gap offers
 
 ### Installation Instructions:
 
-Install all the packages listed in the *[requirements.txt](requirements.txt)* file.
+Install all the packages listed in the *[`requirements.txt`](requirements.txt)* file.
 
 
 ### Usage Instructions:
