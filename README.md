@@ -63,8 +63,8 @@ To experiment with the code, simply run the **[`Experiments.ipynb`](Experiments.
 
 ### References
 
-`[1]`: Fercoq, O.: Quadratic error bound of the smoothed gap and the restarted averaged primal-dual hybrid gradient. Open Journal of Mathematical Optimization 4, 6 (2023). DOI 10.5802/ojmo.26. URL https://ojmo.centre-mersenne.org/articles/10.5802/ojmo.26/.
+<a id="1"></a>`[1]`: Fercoq, O.: Quadratic error bound of the smoothed gap and the restarted averaged primal-dual hybrid gradient. Open Journal of Mathematical Optimization 4, 6 (2023). DOI 10.5802/ojmo.26. URL https://ojmo.centre-mersenne.org/articles/10.5802/ojmo.26/.
 
-`[2]`: Nesterov, Y.: Smooth minimization of non-smooth functions Mathematical Programming 103, 127–152 (2005). URL https://api.semanticscholar.org/CorpusID:2391217.
+<a id="2"></a>`[2]`: Nesterov, Y.: Smooth minimization of non-smooth functions Mathematical Programming 103, 127–152 (2005). URL https://api.semanticscholar.org/CorpusID:2391217.
 
-`[3]`: Tran-Dinh, Q., Fercoq, O., Cevher, V.: A smooth primal-dual optimization framework for nonsmooth composite convex minimization. SIAM Journal on Optimization 28(1), 96–134 (2018). DOI 10.1137/16M1093094. URL https://doi.org/10.1137/16M1093094. 
+<a id="3"></a>`[3]`: Tran-Dinh, Q., Fercoq, O., Cevher, V.: A smooth primal-dual optimization framework for nonsmooth composite convex minimization. SIAM Journal on Optimization 28(1), 96–134 (2018). DOI 10.1137/16M1093094. URL https://doi.org/10.1137/16M1093094. 
