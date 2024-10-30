@@ -141,15 +141,17 @@ class PDHG:
         y = y_bar
         return x, y
 
-    def solve(self, stop_crt='SDG', tol=1e-10, stop_crt_kwargs={}, first_run_iter=None):
+    def solve(self, stop_crt='SDG', OptTol=1e-8, FeasTol=1e-7, stop_crt_kwargs={}, first_run_iter=None):
         """
         Solve the optimization problem using the PDHG algorithm.
 
         Parameters:
             stop_crt (str): Stopping criterion to employ.
                 Default: smoothed duality gap.
-            tol (float): Tolerance for the stopping criterion.
+            OptTol (float): Tolerance for the stopping criterion that approximates the optimality gap.
                 Default: 1e-8
+            FeasTol (float): Tolerance for the feasibility gap. 
+                Default: 1e-7
             stop_crt_kwargs (dict): Additional keyword arguments for the employed stopping criterion.
             first_run_iter (int): Number of iterations required by the first run.
 
@@ -173,15 +175,18 @@ class PDHG:
             # Stopping variables initialization.
             counter = 0   
             gap = np.inf 
+            fe = np.linalg.norm(self.A @ self.xo - self.b)
             # Perform PDHG iterations until the stopping criterion is met or the maximum number of iterations is reached
             print('Progress:') 
             progress = tqdm() 
-            while (gap >= tol and counter <= int(1e6)): # Stopping condition 
+            while ((gap >= OptTol or fe >= FeasTol) and counter <= int(1e6)): # Stopping condition 
                 counter += 1  
                 x, y = self.update_variables(x_prev, y) # Primal-dual update
                 gap = self.stopping_criterion(x, y, stop_crt, **stop_crt_kwargs)
+                fe = np.linalg.norm(self.A @ x - self.b)
+                # print("Optimality = ", gap, '\t', 'Feasibility = ', fe)
                 progress.update()
-                progress.set_postfix(Gap=gap)
+                progress.set_postfix(Feasibility=fe, Optimality=gap)
                 x_prev = x
             return {"No. of iterations": counter, "Primal optimal": x, "Dual optimal": y}
         else:
@@ -204,7 +209,7 @@ class PDHG:
                 dual_var.append(y)
             return {"step": step, "Primal variables": primal_var, "Dual variables": dual_var}
 
-    def two_runs(self, stop_crt='SDG', tol=1e-10, stop_crt_kwargs={}):
+    def two_runs(self, stop_crt='SDG', OptTol=1e-10, FeasTol=1e-10, stop_crt_kwargs={}):
         """
         Perform two runs of the PDHG algorithm. 
             - The first run is done only to identify the required number of iterations.
@@ -223,7 +228,7 @@ class PDHG:
 ╔══════════════════════════════════════╗
 ║              FIRST RUN               ║
 ╚══════════════════════════════════════╝""")
-        first_run = self.solve(stop_crt, tol, stop_crt_kwargs) 
+        first_run = self.solve(stop_crt, OptTol, FeasTol, stop_crt_kwargs) 
         print("""
 ╔══════════════════════════════════════╗
 ║             SECOND RUN               ║
@@ -283,7 +288,7 @@ class PDHG3(PDHG):
         y = y_bar
         return x_bar, x, y
 
-    def solve(self, stop_crt='SDG', tol=1e-10, stop_crt_kwargs={}, first_run_iter=None):
+    def solve(self, stop_crt='SDG', OptTol=1e-8, FeasTol= 1e-7, stop_crt_kwargs={}, first_run_iter=None):
         x_prev, y = self.xo, self.yo  # Primal-dual initialization 
         if stop_crt != "FNoI":  # If the employed stopping criterion is one of: 'DttO', 'KKT error', or 'SDG'.
             print('Stopping Criterion:', stop_crt)
@@ -291,15 +296,17 @@ class PDHG3(PDHG):
             # Stopping variables initialization.
             counter = 0   
             gap = np.inf 
+            fe = np.linalg.norm(self.A @ self.xo - self.b)
             # Perform PDHG iterations until the stopping criterion is met or the maximum number of iterations is reached
             print('Progress:') 
             progress = tqdm() 
-            while (gap >= tol and counter <= int(1e6)): # Stopping condition 
+            while ((gap >= OptTol or fe >= FeasTol) and counter <= int(1e6)): # Stopping condition 
                 counter += 1  
                 x_bar, x, y = self.update_variables(x_prev, y) # Primal-dual update
                 gap = self.stopping_criterion(x_bar, y, stop_crt, **stop_crt_kwargs)
+                fe = np.linalg.norm(self.A @ x_bar - self.b)
                 progress.update()
-                progress.set_postfix(Gap=gap)
+                progress.set_postfix(Feasibility=fe, Optimality=gap)
                 x_prev = x
             return {"No. of iterations": counter, "Primal optimal": x, "Dual optimal": y}
         else:

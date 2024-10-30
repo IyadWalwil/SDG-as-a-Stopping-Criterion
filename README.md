@@ -56,44 +56,6 @@ Install all the packages listed in the *[`requirements.txt`](requirements.txt)* 
 To experiment with the code, simply run the **[`Experiments.ipynb`](Experiments.ipynb)** file, which contains all the conducted experiments. This notebook initializes several instances of the problems defined in [`OptimizationProblems.py`](OptimizationProblems.py), solves them using [`PDHG.py`](PDHG.py), computes measures and bounds with [`OptimizationBounds.py`](OptimizationBounds.py), and finally visualizes the results using [`Plotter.py`](Plotter.py).
 
 
-#### Running a Notebook File on the VM
-
-To run a notebook file on the VM, follow these steps in a terminal:
-
-1. **SSH into the VM:**
-   ```sh
-   ssh your_username@vm_address
-   ```
-
-2. **Navigate to the project directory:**
-   ```sh
-   cd SDG-as-a-Stopping-Criterion
-   ```
-
-3. **Start the Jupyter Notebook server:**
-   ```sh
-   jupyter notebook --no-browser --ip=0.0.0.0 --port=8888
-   ```
-   This command will launch the Jupyter server on the VM, listening on all IP addresses (`0.0.0.0`) and port `8888`.
-
-4. **Note the URL with the token:**
-   When the Jupyter server starts, it will display a URL with a token (e.g., `http://0.0.0.0:8888/?token=...`). You'll need this token to access the notebook server from your local machine.
-
-5. **Open a new terminal window on your local machine.**
-
-6. **Set up port forwarding:**
-   ```sh
-   ssh -i your_ssh_key -L 8888:localhost:8888 your_username@vm_address
-   ```
-
-7. **Open a web browser and go to:**
-   ```sh
-   http://localhost:8888
-   ```
-
-8. **Enter the token provided by the Jupyter server** to access the notebook interface.
-
-
 ### Credits:
 
 - **Produced by:** Iyad Walwil.

@@ -158,10 +158,11 @@ class LeastSquares:
         beta_x, beta_y = beta
         B = self.Q.T @ self.Q + beta_x*np.identity(self.Q.shape[1]) 
         B_inv = np.linalg.inv(B)
-        Mx = self.Q.T @ self.Q + (1/beta_y)*(self.A.T @ self.A) + (beta_x**2)*B_inv - beta_x*np.identity(self.Q.shape[1])
+        Mx = self.Q.T @ self.Q + (1/(beta_y + 1e-18))*(self.A.T @ self.A) + (beta_x**2)*B_inv - beta_x*np.identity(self.Q.shape[1])
         My = self.A @ B_inv @ self.A.T
         Mxy = self.A.T - beta_x * (B_inv @ self.A.T)
         H = np.block([[Mx,Mxy],[Mxy.T,My]])
+        # print("H = ", H)
         return 0.5*H
 
     def matrix_M(self):

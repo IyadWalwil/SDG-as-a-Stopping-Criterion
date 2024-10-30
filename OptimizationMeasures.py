@@ -89,9 +89,9 @@ class OptimizationMeasures:
             float: SDG value of the current solution.
         """
         beta_x, beta_y = beta
-        p = self.prox_f(x - (1/beta_x)*(self.A.T @ y), 1/beta_x) # Proximal point
+        p = self.prox_f(x - (1/(beta_x + 1e-18))*(self.A.T @ y), 1/(beta_x + 1e-18)) # Proximal point
         fx, fp = self.f(x), self.f(p)   # f(x) and f(p)
-        sdg = fx - fp + (self.A @ (x - p) @ y) - (beta_x/2) * np.linalg.norm(x - p)**2 + (self.feasibility_gap(x))**2 / (2 * beta_y) # SDG
+        sdg = fx - fp + (self.A @ (x - p) @ y) - (beta_x/2) * np.linalg.norm(x - p)**2 + (self.feasibility_gap(x))**2 / (2 * (beta_y + 1e-18)) # SDG
         if sdg <= 0 and sdg > -1e-10:  # Avoiding, potential, numerical issues. 
             sdg = 1e-13
         return sdg

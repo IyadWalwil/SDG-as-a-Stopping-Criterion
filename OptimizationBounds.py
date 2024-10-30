@@ -98,6 +98,7 @@ class OptimizationBounds(OptimizationMeasures):
         elif self.beta_mode == 'mixed': # beta is a list of constant values and the feasibility gap.
             print("     --> Beta is mixed of several constant values and feasibility gap.")
             beta_FG = self.FG.copy()  # Feasibility gap part. 
+            # print("Feasibility Gap = ", self.FG)
             eta_FG = self.eta_fun(np.outer(beta_FG, np.ones(2))) # eta for bete equals the feasibility gap
             eta_list = self.eta_fun(beta)  # list of eta values for each constant value of beta
             l1 = len(beta_FG) 
